@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💕 Wishlist của em</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💕 Wishlist của em</h1>
+            <p class="subtitle">Những điều em muốn...</p>
+            <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">
+                <span class="sun">☀️</span>
+                <span class="moon">🌙</span>
+            </button>
+        </header>
+
+        <div class="add-form">
+            <h2>➕ Thêm mới</h2>
+            <form id="wishlistForm">
+                <div class="form-group">
+                    <label for="itemName">Tên món đồ / địa điểm *</label>
+                    <input type="text" id="itemName" required placeholder="Ví dụ: Túi xách, Đà Lạt...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="itemType">Loại</label>
+                    <select id="itemType">
+                        <option value="item">🎁 Món đồ</option>
+                        <option value="place">🗺️ Địa điểm muốn đi</option>
+                        <option value="experience">✨ Trải nghiệm</option>
+                        <option value="other">💭 Khác</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="itemLink">Link (tùy chọn)</label>
+                    <input type="url" id="itemLink" placeholder="https://...">
+                </div>
+
+                <div class="form-group">
+                    <label for="itemNote">Ghi chú</label>
+                    <textarea id="itemNote" rows="2" placeholder="Màu sắc, kích thước, lý do..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary">Thêm vào wishlist 💖</button>
+            </form>
+        </div>
+
+        <div class="filter-section">
+            <button class="filter-btn active" data-filter="all">Tất cả</button>
+            <button class="filter-btn" data-filter="item">🎁 Món đồ</button>
+            <button class="filter-btn" data-filter="place">🗺️ Địa điểm</button>
+            <button class="filter-btn" data-filter="experience">✨ Trải nghiệm</button>
+            <button class="filter-btn" data-filter="other">💭 Khác</button>
+        </div>
+
+        <div class="wishlist" id="wishlist">
+            <!-- Items will be rendered here -->
+        </div>
+
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <p>🌸 Chưa có gì trong wishlist cả</p>
+            <p>Thêm những điều em muốn nhé!</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
