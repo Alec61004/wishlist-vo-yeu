@@ -32,31 +32,43 @@ class WishlistApp {
         });
 
         // Random gift button
-        document.getElementById('randomBtn').addEventListener('click', () => {
-            this.pickRandomItem();
-        });
+        const randomBtn = document.getElementById('randomBtn');
+        const modalClose = document.getElementById('modalClose');
+        const randomAgain = document.getElementById('randomAgain');
+        const randomConfirm = document.getElementById('randomConfirm');
+        const randomModal = document.getElementById('randomModal');
 
-        // Modal close button
-        document.getElementById('modalClose').addEventListener('click', () => {
-            this.closeRandomModal();
-        });
+        if (randomBtn) {
+            randomBtn.addEventListener('click', () => {
+                this.pickRandomItem();
+            });
+        }
 
-        // Random again button
-        document.getElementById('randomAgain').addEventListener('click', () => {
-            this.pickRandomItem();
-        });
-
-        // Confirm random selection
-        document.getElementById('randomConfirm').addEventListener('click', () => {
-            this.confirmRandomSelection();
-        });
-
-        // Close modal when clicking outside
-        document.getElementById('randomModal').addEventListener('click', (e) => {
-            if (e.target.id === 'randomModal') {
+        if (modalClose) {
+            modalClose.addEventListener('click', () => {
                 this.closeRandomModal();
-            }
-        });
+            });
+        }
+
+        if (randomAgain) {
+            randomAgain.addEventListener('click', () => {
+                this.pickRandomItem();
+            });
+        }
+
+        if (randomConfirm) {
+            randomConfirm.addEventListener('click', () => {
+                this.confirmRandomSelection();
+            });
+        }
+
+        if (randomModal) {
+            randomModal.addEventListener('click', (e) => {
+                if (e.target.id === 'randomModal') {
+                    this.closeRandomModal();
+                }
+            });
+        }
     }
 
     addItem() {
@@ -326,18 +338,20 @@ class WishlistApp {
 
     confirmRandomSelection() {
         if (this.currentRandomItem) {
+            const selectedItem = this.currentRandomItem;
+
             // Highlight the selected item in the list
-            this.highlightRandomItem(this.currentRandomItem.id);
-            
+            this.highlightRandomItem(selectedItem.id);
+
             // Close modal
             this.closeRandomModal();
-            
+
             // Show notification
-            this.showNotification(`Đã chọn: ${this.currentRandomItem.name} 🎁`);
-            
+            this.showNotification(`Đã chọn: ${selectedItem.name} 🎁`);
+
             // Scroll to the highlighted item
             setTimeout(() => {
-                const itemElement = document.querySelector(`[data-id="${this.currentRandomItem.id}"]`);
+                const itemElement = document.querySelector(`[data-id="${selectedItem.id}"]`);
                 if (itemElement) {
                     itemElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
