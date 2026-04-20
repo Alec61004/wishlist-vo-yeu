@@ -7,10 +7,8 @@ class WishlistApp {
         this.currentRole = null;
 
         // Lưu ý: đây chỉ là bảo vệ UI phía client, không phải bảo mật backend thực sự
-        this.passwords = {
-            wife: 'thao123',
-            husband: 'chong123'
-        };
+        this.defaultHusbandPassword = 'chong';
+        this.defaultWifePassword = 'thao123';
 
         this.init();
     }
@@ -35,6 +33,33 @@ class WishlistApp {
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => this.logout());
+        }
+
+        // Change wife password
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+        const changePasswordClose = document.getElementById('changePasswordClose');
+        const changePasswordForm = document.getElementById('changePasswordForm');
+        const changePasswordModal = document.getElementById('changePasswordModal');
+
+        if (changePasswordBtn) {
+            changePasswordBtn.addEventListener('click', () => this.openChangePasswordModal());
+        }
+
+        if (changePasswordClose) {
+            changePasswordClose.addEventListener('click', () => this.closeChangePasswordModal());
+        }
+
+        if (changePasswordForm) {
+            changePasswordForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.changeWifePassword();
+            });
+        }
+
+        if (changePasswordModal) {
+            changePasswordModal.addEventListener('click', (e) => {
+                if (e.target.id === 'changePasswordModal') this.closeChangePasswordModal();
+            });
         }
 
         // Form submission
@@ -96,9 +121,12 @@ class WishlistApp {
         const input = document.getElementById('password');
         const password = input.value;
 
-        if (password === this.passwords.wife) {
+        const wifePassword = this.getWifePassword();
+        const husbandPassword = this.defaultHusbandPassword;
+
+        if (password === wifePassword) {
             this.currentRole = 'wife';
-        } else if (password === this.passwords.husband) {
+        } else if (password === husbandPassword) {
             this.currentRole = 'husband';
         } else {
             alert('Sai mật khẩu, thử lại nhé!');
@@ -148,6 +176,60 @@ class WishlistApp {
 
     isWifeMode() {
         return this.currentRole === 'wife';
+    }
+
+    getWifePassword() {
+        return localStorage.getItem('wishlist_wife_password') || this.defaultWifePassword;
+    }
+
+    openChangePasswordModal() {
+        if (!this.isWifeMode()) return;
+        const modal = document.getElementById('changePasswordModal');
+        if (modal) modal.style.display = 'flex';
+    }
+
+    closeChangePasswordModal() {
+        const modal = document.getElementById('changePasswordModal');
+        if (modal) modal.style.display = 'none';
+
+        const form = document.getElementById('changePasswordForm');
+        if (form) form.reset();
+    }
+
+    changeWifePassword() {
+        if (!this.isWifeMode()) return;
+
+        const currentPasswordInput = document.getElementById('currentPassword');
+        const newPasswordInput = document.getElementById('newPassword');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+
+        const currentPassword = currentPasswordInput.value;
+        const newPassword = newPasswordInput.value.trim();
+        const confirmPassword = confirmPasswordInput.value.trim();
+
+        if (currentPassword !== this.getWifePassword()) {
+            alert('Mật khẩu hiện tại không đúng.');
+            return;
+        }
+
+        if (newPassword.length < 4) {
+            alert('Mật khẩu mới cần ít nhất 4 ký tự.');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            alert('Mật khẩu xác nhận không khớp.');
+            return;
+        }
+
+        if (newPassword === this.defaultHusbandPassword) {
+            alert('Không thể đặt trùng mật khẩu của chồng.');
+            return;
+        }
+
+        localStorage.setItem('wishlist_wife_password', newPassword);
+        this.closeChangePasswordModal();
+        this.showNotification('Đổi mật khẩu thành công! 🔐');
     }
 
     // ===== WISHLIST =====

@@ -688,7 +688,9 @@ body[data-role="husband"] .add-form {
 .logout-section {
     display: flex;
     justify-content: center;
+    gap: 10px;
     margin-top: 20px;
+    flex-wrap: wrap;
 }
 
 .btn-logout {
@@ -714,5 +716,13 @@ body[data-role="husband"] .add-form {
 
     .login-header h1 {
         font-size: 1.5rem;
+    }
+
+    .logout-section {
+        flex-direction: column;
+    }
+
+    .btn-logout {
+        width: 100%;
     }
 }
