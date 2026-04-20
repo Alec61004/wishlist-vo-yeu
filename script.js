@@ -137,7 +137,7 @@ class WishlistApp {
         this.showMainApp();
         this.applyRolePermissions();
         this.render();
-        this.showNotification(this.currentRole === 'wife' ? 'Đăng nhập chế độ Thảo 💖' : 'Đăng nhập chế độ chồng 🎁');
+        this.showNotification('Đăng nhập thành công! 💖');
         input.value = '';
     }
 
@@ -165,13 +165,6 @@ class WishlistApp {
 
     applyRolePermissions() {
         document.body.setAttribute('data-role', this.currentRole);
-
-        const roleBadge = document.getElementById('roleBadge');
-        if (roleBadge) {
-            roleBadge.textContent = this.currentRole === 'wife'
-                ? '👩 Chế độ Thảo: toàn quyền chỉnh sửa'
-                : '👨 Chế độ chồng: chỉ xem + random quà';
-        }
     }
 
     isWifeMode() {
@@ -235,7 +228,7 @@ class WishlistApp {
     // ===== WISHLIST =====
     addItem() {
         if (!this.isWifeMode()) {
-            alert('Chỉ chế độ của Thảo mới được thêm/sửa wishlist.');
+            alert('Bạn không có quyền thêm món mới.');
             return;
         }
 
@@ -269,7 +262,7 @@ class WishlistApp {
 
     deleteItem(id) {
         if (!this.isWifeMode()) {
-            alert('Chỉ chế độ của Thảo mới được xóa món.');
+            alert('Bạn không có quyền xóa món.');
             return;
         }
 
@@ -283,7 +276,7 @@ class WishlistApp {
 
     toggleComplete(id) {
         if (!this.isWifeMode()) {
-            alert('Chỉ chế độ của Thảo mới được đánh dấu hoàn thành.');
+            alert('Bạn không có quyền đánh dấu hoàn thành.');
             return;
         }
 
