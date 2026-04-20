@@ -659,40 +659,23 @@ header h1 {
 }
 
 /* Role-based visibility */
-.husband-only {
+.owner-only {
     display: none !important;
 }
 
-.wife-only {
+/* When logged in as owner */
+body[data-role="owner"] .owner-only {
     display: block !important;
 }
 
-/* When logged in as husband */
-body[data-role="husband"] .husband-only {
-    display: block !important;
-}
-
-body[data-role="husband"] .wife-only {
+/* When logged in as guest (ngobao2004) */
+body[data-role="guest"] .owner-only {
     display: none !important;
 }
 
-/* When logged in as wife */
-body[data-role="wife"] .husband-only {
-    display: none !important;
-}
-
-body[data-role="wife"] .wife-only {
-    display: block !important;
-}
-
-/* Hide edit buttons for husband */
-body[data-role="husband"] .btn-complete,
-body[data-role="husband"] .btn-delete {
-    display: none !important;
-}
-
-/* Hide add form for husband */
-body[data-role="husband"] .add-form {
+/* Hide edit buttons for guest */
+body[data-role="guest"] .btn-complete,
+body[data-role="guest"] .btn-delete {
     display: none !important;
 }
 
@@ -721,13 +704,13 @@ body[data-role="husband"] .add-form {
     background: var(--card-bg);
 }
 
-body[data-role="wife"] .mode-badge {
+body[data-role="owner"] .mode-badge {
     color: var(--success);
     border-color: rgba(0, 184, 148, 0.35);
     background: rgba(0, 184, 148, 0.08);
 }
 
-body[data-role="husband"] .mode-badge {
+body[data-role="guest"] .mode-badge {
     color: #0984e3;
     border-color: rgba(9, 132, 227, 0.35);
     background: rgba(9, 132, 227, 0.08);

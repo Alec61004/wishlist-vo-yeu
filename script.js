@@ -4,11 +4,14 @@ class WishlistApp {
         this.items = this.loadItems();
         this.currentFilter = 'all';
         this.currentRandomItem = null;
-        this.currentRole = null;
+        this.currentUser = null;
 
-        // Lưu ý: đây chỉ là bảo vệ UI phía client, không phải bảo mật backend thực sự
-        this.defaultHusbandPassword = 'chong';
-        this.defaultWifePassword = 'thao123';
+        // Tài khoản mặc định của bạn
+        this.defaultGuestAccount = {
+            username: 'ngobao2004',
+            password: 'chongalec',
+            role: 'guest'
+        };
 
         this.init();
     }
@@ -29,37 +32,25 @@ class WishlistApp {
             });
         }
 
+        // Register
+        const registerForm = document.getElementById('registerForm');
+        if (registerForm) {
+            registerForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.register();
+            });
+        }
+
+        // Show/Hide screens
+        const showRegister = document.getElementById('showRegister');
+        const showLogin = document.getElementById('showLogin');
+        if (showRegister) showRegister.addEventListener('click', (e) => { e.preventDefault(); this.showRegisterScreen(); });
+        if (showLogin) showLogin.addEventListener('click', (e) => { e.preventDefault(); this.showLoginScreen(); });
+
         // Logout
         const logoutBtn = document.getElementById('logoutBtn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => this.logout());
-        }
-
-        // Change wife password
-        const changePasswordBtn = document.getElementById('changePasswordBtn');
-        const changePasswordClose = document.getElementById('changePasswordClose');
-        const changePasswordForm = document.getElementById('changePasswordForm');
-        const changePasswordModal = document.getElementById('changePasswordModal');
-
-        if (changePasswordBtn) {
-            changePasswordBtn.addEventListener('click', () => this.openChangePasswordModal());
-        }
-
-        if (changePasswordClose) {
-            changePasswordClose.addEventListener('click', () => this.closeChangePasswordModal());
-        }
-
-        if (changePasswordForm) {
-            changePasswordForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.changeWifePassword();
-            });
-        }
-
-        if (changePasswordModal) {
-            changePasswordModal.addEventListener('click', (e) => {
-                if (e.target.id === 'changePasswordModal') this.closeChangePasswordModal();
-            });
         }
 
         // Form submission
@@ -104,11 +95,11 @@ class WishlistApp {
         }
     }
 
-    // ===== AUTH / ROLE =====
+    // ===== AUTH / USER =====
     initAuth() {
-        const savedRole = localStorage.getItem('wishlist_role');
-        if (savedRole === 'wife' || savedRole === 'husband') {
-            this.currentRole = savedRole;
+        const savedUser = localStorage.getItem('wishlist_current_user');
+        if (savedUser) {
+            this.currentUser = JSON.parse(savedUser);
             this.showMainApp();
             this.applyRolePermissions();
             this.render();
@@ -117,124 +108,158 @@ class WishlistApp {
         }
     }
 
+    getUsers() {
+        const users = localStorage.getItem('wishlist_users');
+        return users ? JSON.parse(users) : [];
+    }
+
+    saveUsers(users) {
+        localStorage.setItem('wishlist_users', JSON.stringify(users));
+    }
+
     login() {
-        const input = document.getElementById('password');
-        const password = input.value;
+        const usernameInput = document.getElementById('loginUsername');
+        const passwordInput = document.getElementById('loginPassword');
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
 
-        const wifePassword = this.getWifePassword();
-        const husbandPassword = this.defaultHusbandPassword;
-
-        if (password === wifePassword) {
-            this.currentRole = 'wife';
-        } else if (password === husbandPassword) {
-            this.currentRole = 'husband';
+        // Kiểm tra tài khoản mặc định của bạn
+        if (username === this.defaultGuestAccount.username && password === this.defaultGuestAccount.password) {
+            this.currentUser = { ...this.defaultGuestAccount };
+            this.currentUser.role = 'guest';
+            this.currentUser.displayName = 'Người tặng quà';
         } else {
-            alert('Sai mật khẩu, thử lại nhé!');
-            return;
+            // Kiểm tra tài khoản đã đăng ký
+            const users = this.getUsers();
+            const user = users.find(u => u.username === username && u.password === password);
+
+            if (!user) {
+                alert('Tên đăng nhập hoặc mật khẩu không đúng!');
+                return;
+            }
+
+            this.currentUser = { ...user };
+            this.currentUser.role = 'owner';
+            this.currentUser.displayName = user.username;
         }
 
-        localStorage.setItem('wishlist_role', this.currentRole);
+        localStorage.setItem('wishlist_current_user', JSON.stringify(this.currentUser));
         this.showMainApp();
         this.applyRolePermissions();
         this.render();
-        this.showNotification('Đăng nhập thành công! 💖');
-        input.value = '';
+        this.showNotification(`Xin chào, ${this.currentUser.displayName}! 💖`);
+
+        usernameInput.value = '';
+        passwordInput.value = '';
+    }
+
+    register() {
+        const usernameInput = document.getElementById('regUsername');
+        const passwordInput = document.getElementById('regPassword');
+        const confirmPasswordInput = document.getElementById('regConfirmPassword');
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value.trim();
+        const confirmPassword = confirmPasswordInput.value.trim();
+
+        // Validate
+        if (username.length < 3) {
+            alert('Tên đăng nhập cần ít nhất 3 ký tự!');
+            return;
+        }
+
+        if (password.length < 4) {
+            alert('Mật khẩu cần ít nhất 4 ký tự!');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            alert('Mật khẩu xác nhận không khớp!');
+            return;
+        }
+
+        // Kiểm tra trùng username
+        const users = this.getUsers();
+        if (users.find(u => u.username === username)) {
+            alert('Tên đăng nhập đã tồn tại!');
+            return;
+        }
+
+        // Không cho đăng ký trùng với tài khoản mặc định
+        if (username === this.defaultGuestAccount.username) {
+            alert('Tên đăng nhập này đã được sử dụng!');
+            return;
+        }
+
+        // Tạo user mới
+        const newUser = {
+            username,
+            password,
+            role: 'owner',
+            createdAt: new Date().toISOString()
+        };
+
+        users.push(newUser);
+        this.saveUsers(users);
+
+        alert('Đăng ký thành công! Hãy đăng nhập ngay.');
+        this.showLoginScreen();
+
+        usernameInput.value = '';
+        passwordInput.value = '';
+        confirmPasswordInput.value = '';
     }
 
     logout() {
-        localStorage.removeItem('wishlist_role');
-        this.currentRole = null;
+        localStorage.removeItem('wishlist_current_user');
+        this.currentUser = null;
         this.closeRandomModal();
         this.showLoginScreen();
     }
 
     showLoginScreen() {
         const loginScreen = document.getElementById('loginScreen');
+        const registerScreen = document.getElementById('registerScreen');
         const mainApp = document.getElementById('mainApp');
         if (loginScreen) loginScreen.style.display = 'flex';
+        if (registerScreen) registerScreen.style.display = 'none';
         if (mainApp) mainApp.style.display = 'none';
         document.body.removeAttribute('data-role');
     }
 
+    showRegisterScreen() {
+        const loginScreen = document.getElementById('loginScreen');
+        const registerScreen = document.getElementById('registerScreen');
+        if (loginScreen) loginScreen.style.display = 'none';
+        if (registerScreen) registerScreen.style.display = 'flex';
+    }
+
     showMainApp() {
         const loginScreen = document.getElementById('loginScreen');
+        const registerScreen = document.getElementById('registerScreen');
         const mainApp = document.getElementById('mainApp');
         if (loginScreen) loginScreen.style.display = 'none';
+        if (registerScreen) registerScreen.style.display = 'none';
         if (mainApp) mainApp.style.display = 'block';
     }
 
     applyRolePermissions() {
-        document.body.setAttribute('data-role', this.currentRole);
+        document.body.setAttribute('data-role', this.currentUser.role);
 
         const modeBadge = document.getElementById('modeBadge');
         if (modeBadge) {
-            modeBadge.textContent = this.currentRole === 'wife'
+            modeBadge.textContent = this.currentUser.role === 'owner'
                 ? '🔓 Chế độ chỉnh sửa'
                 : '🔒 Chế độ xem';
         }
     }
 
-    isWifeMode() {
-        return this.currentRole === 'wife';
-    }
-
-    getWifePassword() {
-        return localStorage.getItem('wishlist_wife_password') || this.defaultWifePassword;
-    }
-
-    openChangePasswordModal() {
-        if (!this.isWifeMode()) return;
-        const modal = document.getElementById('changePasswordModal');
-        if (modal) modal.style.display = 'flex';
-    }
-
-    closeChangePasswordModal() {
-        const modal = document.getElementById('changePasswordModal');
-        if (modal) modal.style.display = 'none';
-
-        const form = document.getElementById('changePasswordForm');
-        if (form) form.reset();
-    }
-
-    changeWifePassword() {
-        if (!this.isWifeMode()) return;
-
-        const currentPasswordInput = document.getElementById('currentPassword');
-        const newPasswordInput = document.getElementById('newPassword');
-        const confirmPasswordInput = document.getElementById('confirmPassword');
-
-        const currentPassword = currentPasswordInput.value;
-        const newPassword = newPasswordInput.value.trim();
-        const confirmPassword = confirmPasswordInput.value.trim();
-
-        if (currentPassword !== this.getWifePassword()) {
-            alert('Mật khẩu hiện tại không đúng.');
-            return;
-        }
-
-        if (newPassword.length < 4) {
-            alert('Mật khẩu mới cần ít nhất 4 ký tự.');
-            return;
-        }
-
-        if (newPassword !== confirmPassword) {
-            alert('Mật khẩu xác nhận không khớp.');
-            return;
-        }
-
-        if (newPassword === this.defaultHusbandPassword) {
-            alert('Không thể đặt trùng mật khẩu của chồng.');
-            return;
-        }
-
-        localStorage.setItem('wishlist_wife_password', newPassword);
-        this.closeChangePasswordModal();
-        this.showNotification('Đổi mật khẩu thành công! 🔐');
+    isOwner() {
+        return this.currentUser && this.currentUser.role === 'owner';
     }
 
     // ===== WISHLIST =====
     addItem() {
-        if (!this.isWifeMode()) {
+        if (!this.isOwner()) {
             alert('Bạn không có quyền thêm món mới.');
             return;
         }
@@ -268,7 +293,7 @@ class WishlistApp {
     }
 
     deleteItem(id) {
-        if (!this.isWifeMode()) {
+        if (!this.isOwner()) {
             alert('Bạn không có quyền xóa món.');
             return;
         }
@@ -282,7 +307,7 @@ class WishlistApp {
     }
 
     toggleComplete(id) {
-        if (!this.isWifeMode()) {
+        if (!this.isOwner()) {
             alert('Bạn không có quyền đánh dấu hoàn thành.');
             return;
         }
@@ -416,9 +441,9 @@ class WishlistApp {
             `;
         }
 
-        // Chồng chỉ xem random, không cần nút "chọn món này"
+        // Guest chỉ xem random, không cần nút "chọn món này"
         if (randomConfirm) {
-            randomConfirm.style.display = this.currentRole === 'husband' ? 'none' : 'inline-block';
+            randomConfirm.style.display = this.currentUser.role === 'guest' ? 'none' : 'inline-block';
         }
 
         modal.style.display = 'flex';

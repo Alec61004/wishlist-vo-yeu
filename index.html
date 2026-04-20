@@ -12,15 +12,45 @@
         <div class="login-container">
             <div class="login-header">
                 <h1>💕 Wishlist của Thảo</h1>
-                <p class="subtitle">Nhập mật khẩu để tiếp tục</p>
+                <p class="subtitle">Đăng nhập để tiếp tục</p>
             </div>
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="password">Mật khẩu</label>
-                    <input type="password" id="password" required placeholder="Nhập mật khẩu...">
+                    <label for="loginUsername">Tên đăng nhập</label>
+                    <input type="text" id="loginUsername" required placeholder="Nhập tên đăng nhập...">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Mật khẩu</label>
+                    <input type="password" id="loginPassword" required placeholder="Nhập mật khẩu...">
                 </div>
                 <button type="submit" class="btn-primary">Đăng nhập 🔐</button>
-                <p class="login-hint">🔒 Nhập đúng mật khẩu để vào chế độ phù hợp</p>
+                <p class="login-hint">Chưa có tài khoản? <a href="#" id="showRegister">Đăng ký ngay</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Screen -->
+    <div id="registerScreen" class="login-screen" style="display: none;">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>💕 Đăng ký tài khoản</h1>
+                <p class="subtitle">Tạo tài khoản mới</p>
+            </div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="regUsername">Tên đăng nhập *</label>
+                    <input type="text" id="regUsername" required placeholder="Nhập tên đăng nhập...">
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Mật khẩu *</label>
+                    <input type="password" id="regPassword" required placeholder="Nhập mật khẩu...">
+                </div>
+                <div class="form-group">
+                    <label for="regConfirmPassword">Xác nhận mật khẩu *</label>
+                    <input type="password" id="regConfirmPassword" required placeholder="Nhập lại mật khẩu...">
+                </div>
+                <button type="submit" class="btn-primary">Đăng ký 📝</button>
+                <p class="login-hint">Đã có tài khoản? <a href="#" id="showLogin">Đăng nhập ngay</a></p>
             </form>
         </div>
     </div>
@@ -37,7 +67,8 @@
             </button>
         </header>
 
-        <div class="add-form">
+        <!-- Add Form (only for owner) -->
+        <div class="add-form owner-only">
             <h2>➕ Thêm mới</h2>
             <form id="wishlistForm">
                 <div class="form-group">
@@ -69,7 +100,8 @@
             </form>
         </div>
 
-        <div class="filter-section">
+        <!-- Filter Section (only for owner) -->
+        <div class="filter-section owner-only">
             <button class="filter-btn active" data-filter="all">Tất cả</button>
             <button class="filter-btn" data-filter="item">🎁 Món đồ</button>
             <button class="filter-btn" data-filter="place">🗺️ Địa điểm</button>
@@ -77,51 +109,28 @@
             <button class="filter-btn" data-filter="other">💭 Khác</button>
         </div>
 
+        <!-- Random Section (for everyone) -->
         <div class="random-section">
             <button id="randomBtn" class="btn-random">🎲 Random Gift - Chọn ngẫu nhiên!</button>
         </div>
 
-        <div class="logout-section">
-            <button id="logoutBtn" class="btn-logout">🚪 Đăng xuất</button>
-            <button id="changePasswordBtn" class="btn-logout wife-only">🔐 Đổi mật khẩu</button>
-        </div>
-
-        <!-- Change Password Modal -->
-        <div id="changePasswordModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>🔐 Đổi mật khẩu</h2>
-                    <button class="modal-close" id="changePasswordClose">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <form id="changePasswordForm">
-                        <div class="form-group">
-                            <label for="currentPassword">Mật khẩu hiện tại</label>
-                            <input type="password" id="currentPassword" required placeholder="Nhập mật khẩu hiện tại...">
-                        </div>
-                        <div class="form-group">
-                            <label for="newPassword">Mật khẩu mới</label>
-                            <input type="password" id="newPassword" required placeholder="Nhập mật khẩu mới...">
-                        </div>
-                        <div class="form-group">
-                            <label for="confirmPassword">Xác nhận mật khẩu mới</label>
-                            <input type="password" id="confirmPassword" required placeholder="Nhập lại mật khẩu mới...">
-                        </div>
-                        <button type="submit" class="btn-primary">💾 Lưu mật khẩu mới</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="wishlist" id="wishlist">
+        <!-- Wishlist (only for owner) -->
+        <div class="wishlist owner-only" id="wishlist">
             <!-- Items will be rendered here -->
         </div>
 
-        <div class="empty-state" id="emptyState" style="display: none;">
+        <!-- Empty State (only for owner) -->
+        <div class="empty-state owner-only" id="emptyState" style="display: none;">
             <p>🌸 Chưa có gì trong wishlist cả</p>
             <p>Thêm những điều em muốn nhé!</p>
         </div>
 
+        <!-- Logout Section -->
+        <div class="logout-section">
+            <button id="logoutBtn" class="btn-logout">🚪 Đăng xuất</button>
+        </div>
+
+        <!-- Random Modal -->
         <div id="randomModal" class="modal" style="display: none;">
             <div class="modal-content">
                 <div class="modal-header">
