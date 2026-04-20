@@ -592,3 +592,127 @@ header h1 {
     border-color: var(--primary);
     box-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
 }
+
+/* Login Screen Styles */
+.login-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+}
+
+.login-container {
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    border: 2px solid var(--border);
+    max-width: 400px;
+    width: 100%;
+    animation: slideUp 0.3s ease;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-header h1 {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.login-header .subtitle {
+    color: var(--text-light);
+    font-size: 1rem;
+}
+
+.login-hint {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.85rem;
+    margin-top: 15px;
+    padding: 10px;
+    background: var(--bg);
+    border-radius: 8px;
+    border: 1px dashed var(--border);
+}
+
+/* Role-based visibility */
+.husband-only {
+    display: none !important;
+}
+
+.wife-only {
+    display: block !important;
+}
+
+/* When logged in as husband */
+body[data-role="husband"] .husband-only {
+    display: block !important;
+}
+
+body[data-role="husband"] .wife-only {
+    display: none !important;
+}
+
+/* When logged in as wife */
+body[data-role="wife"] .husband-only {
+    display: none !important;
+}
+
+body[data-role="wife"] .wife-only {
+    display: block !important;
+}
+
+/* Hide edit buttons for husband */
+body[data-role="husband"] .btn-complete,
+body[data-role="husband"] .btn-delete {
+    display: none !important;
+}
+
+/* Hide add form for husband */
+body[data-role="husband"] .add-form {
+    display: none !important;
+}
+
+/* Show logout button */
+.logout-section {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.btn-logout {
+    padding: 10px 20px;
+    background: var(--bg);
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.btn-logout:hover {
+    border-color: var(--primary);
+    background: var(--card-bg);
+}
+
+@media (max-width: 600px) {
+    .login-container {
+        padding: 30px 20px;
+    }
+
+    .login-header h1 {
+        font-size: 1.5rem;
+    }
+}

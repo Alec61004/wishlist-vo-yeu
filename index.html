@@ -7,10 +7,30 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>💕 Wishlist của Thảo</h1>
+                <p class="subtitle">Nhập mật khẩu để tiếp tục</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="password">Mật khẩu</label>
+                    <input type="password" id="password" required placeholder="Nhập mật khẩu...">
+                </div>
+                <button type="submit" class="btn-primary">Đăng nhập 🔐</button>
+                <p class="login-hint">🔒 Nhập đúng mật khẩu để vào chế độ phù hợp</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App (hidden until login) -->
+    <div id="mainApp" class="container" style="display: none;">
         <header>
             <h1>💕 Wishlist của Thảo</h1>
             <p class="subtitle">Những điều má phính muốn...</p>
+            <p id="roleBadge" class="role-badge"></p>
             <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">
                 <span class="sun">☀️</span>
                 <span class="moon">🌙</span>
@@ -59,6 +79,10 @@
 
         <div class="random-section">
             <button id="randomBtn" class="btn-random">🎲 Random Gift - Chọn ngẫu nhiên!</button>
+        </div>
+
+        <div class="logout-section">
+            <button id="logoutBtn" class="btn-logout">🚪 Đăng xuất</button>
         </div>
 
         <div class="wishlist" id="wishlist">
