@@ -5,6 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>💕 Wishlist của Thảo</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, deleteDoc, query, where, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkwcL3MQhO37WGb13vJP3XWsL2RdLdSRs",
+            authDomain: "wishlist-cua-em.firebaseapp.com",
+            projectId: "wishlist-cua-em",
+            storageBucket: "wishlist-cua-em.firebasestorage.app",
+            messagingSenderId: "313897245124",
+            appId: "1:313897245124:web:3ded3da3f0bf6f63722c91",
+            measurementId: "G-XJHPR1CWLS"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+        window.firebaseAuthMethods = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged };
+        window.firestoreMethods = { collection, doc, setDoc, getDoc, updateDoc, deleteDoc, query, where, getDocs, onSnapshot };
+    </script>
 </head>
 <body>
     <!-- Login Screen -->
