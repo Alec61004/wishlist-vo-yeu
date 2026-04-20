@@ -1,4 +1,4 @@
-# 💕 Wishlist của em
+# 💕 Wishlist của Má Phính
 
 Một trang web wishlist xinh xắn để lưu trữ những món đồ yêu thích và địa điểm muốn đi!
 
