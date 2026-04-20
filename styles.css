@@ -179,6 +179,43 @@ header h1 {
     flex-wrap: wrap;
 }
 
+.random-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.btn-random {
+    padding: 15px 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-random:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+}
+
+.btn-random:active {
+    transform: translateY(-1px) scale(1.02);
+}
+
+.btn-random:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .filter-btn {
     padding: 8px 16px;
     background: var(--card-bg);
@@ -381,4 +418,177 @@ header h1 {
     .btn-action {
         width: 100%;
     }
+
+    .btn-random {
+        padding: 12px 20px;
+        font-size: 1rem;
+    }
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background: var(--card-bg);
+    border-radius: 20px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 2px solid var(--border);
+}
+
+.modal-header h2 {
+    color: var(--primary);
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s;
+}
+
+.modal-close:hover {
+    background: var(--border);
+    color: var(--text);
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+.random-item {
+    text-align: center;
+    padding: 20px;
+    background: var(--bg);
+    border-radius: 15px;
+    border: 2px solid var(--primary);
+}
+
+.random-item .item-type {
+    margin-bottom: 15px;
+}
+
+.random-item .item-name {
+    font-size: 1.5rem;
+    color: var(--primary);
+    margin-bottom: 15px;
+}
+
+.random-item .item-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 15px;
+}
+
+.random-item .item-note {
+    text-align: left;
+}
+
+.random-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-light);
+}
+
+.random-empty p {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 10px;
+    padding: 20px 25px;
+    border-top: 2px solid var(--border);
+}
+
+.btn-secondary {
+    flex: 1;
+    padding: 12px 20px;
+    background: var(--bg);
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-secondary:hover {
+    border-color: var(--primary);
+    background: var(--card-bg);
+}
+
+/* Highlight animation for selected item */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 107, 157, 0.7);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 0 0 20px rgba(255, 107, 157, 0);
+    }
+}
+
+.wishlist-item.highlighted {
+    animation: pulse 1.5s ease-in-out;
+    border-color: var(--primary);
+    box-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
 }

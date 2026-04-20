@@ -30,6 +30,33 @@ class WishlistApp {
                 this.setFilter(e.target.dataset.filter);
             });
         });
+
+        // Random gift button
+        document.getElementById('randomBtn').addEventListener('click', () => {
+            this.pickRandomItem();
+        });
+
+        // Modal close button
+        document.getElementById('modalClose').addEventListener('click', () => {
+            this.closeRandomModal();
+        });
+
+        // Random again button
+        document.getElementById('randomAgain').addEventListener('click', () => {
+            this.pickRandomItem();
+        });
+
+        // Confirm random selection
+        document.getElementById('randomConfirm').addEventListener('click', () => {
+            this.confirmRandomSelection();
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('randomModal').addEventListener('click', (e) => {
+            if (e.target.id === 'randomModal') {
+                this.closeRandomModal();
+            }
+        });
     }
 
     addItem() {
@@ -233,6 +260,107 @@ class WishlistApp {
             notification.style.animation = 'slideOut 0.3s ease';
             setTimeout(() => notification.remove(), 300);
         }, 2000);
+    }
+
+    // Random Gift Methods
+    pickRandomItem() {
+        // Get only uncompleted items
+        const availableItems = this.items.filter(item => !item.completed);
+        
+        if (availableItems.length === 0) {
+            alert('Không có món nào để chọn! Hãy thêm món mới vào wishlist hoặc bỏ đánh dấu hoàn thành.');
+            return;
+        }
+
+        // Random selection
+        const randomIndex = Math.floor(Math.random() * availableItems.length);
+        this.currentRandomItem = availableItems[randomIndex];
+        
+        this.showRandomModal();
+    }
+
+    showRandomModal() {
+        const modal = document.getElementById('randomModal');
+        const resultDiv = document.getElementById('randomResult');
+        
+        if (!this.currentRandomItem) {
+            resultDiv.innerHTML = `
+                <div class="random-empty">
+                    <p>😢 Không có món nào để chọn!</p>
+                    <p>Hãy thêm món mới vào wishlist nhé.</p>
+                </div>
+            `;
+        } else {
+            const typeLabels = {
+                item: '🎁 Món đồ',
+                place: '🗺️ Địa điểm',
+                experience: '✨ Trải nghiệm',
+                other: '💭 Khác'
+            };
+
+            const linkHtml = this.currentRandomItem.link 
+                ? `<a href="${this.escapeHtml(this.currentRandomItem.link)}" target="_blank" class="item-link">🔗 Xem link</a>`
+                : '';
+
+            const noteHtml = this.currentRandomItem.note 
+                ? `<div class="item-note">${this.escapeHtml(this.currentRandomItem.note)}</div>`
+                : '';
+
+            resultDiv.innerHTML = `
+                <div class="random-item">
+                    <span class="item-type ${this.currentRandomItem.type}">${typeLabels[this.currentRandomItem.type]}</span>
+                    <div class="item-name">${this.escapeHtml(this.currentRandomItem.name)}</div>
+                    ${linkHtml}
+                    ${noteHtml}
+                </div>
+            `;
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    closeRandomModal() {
+        document.getElementById('randomModal').style.display = 'none';
+        this.currentRandomItem = null;
+    }
+
+    confirmRandomSelection() {
+        if (this.currentRandomItem) {
+            // Highlight the selected item in the list
+            this.highlightRandomItem(this.currentRandomItem.id);
+            
+            // Close modal
+            this.closeRandomModal();
+            
+            // Show notification
+            this.showNotification(`Đã chọn: ${this.currentRandomItem.name} 🎁`);
+            
+            // Scroll to the highlighted item
+            setTimeout(() => {
+                const itemElement = document.querySelector(`[data-id="${this.currentRandomItem.id}"]`);
+                if (itemElement) {
+                    itemElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
+        }
+    }
+
+    highlightRandomItem(id) {
+        // Remove highlight from all items
+        document.querySelectorAll('.wishlist-item').forEach(item => {
+            item.classList.remove('highlighted');
+        });
+
+        // Add highlight to selected item
+        const itemElement = document.querySelector(`[data-id="${id}"]`);
+        if (itemElement) {
+            itemElement.classList.add('highlighted');
+            
+            // Remove highlight after animation
+            setTimeout(() => {
+                itemElement.classList.remove('highlighted');
+            }, 1500);
+        }
     }
 }
 
