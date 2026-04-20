@@ -165,6 +165,13 @@ class WishlistApp {
 
     applyRolePermissions() {
         document.body.setAttribute('data-role', this.currentRole);
+
+        const modeBadge = document.getElementById('modeBadge');
+        if (modeBadge) {
+            modeBadge.textContent = this.currentRole === 'wife'
+                ? '🔓 Chế độ chỉnh sửa'
+                : '🔒 Chế độ xem';
+        }
     }
 
     isWifeMode() {
