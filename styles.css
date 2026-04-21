@@ -688,6 +688,34 @@ body[data-role="guest"] .btn-delete {
     flex-wrap: wrap;
 }
 
+.github-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.btn-github {
+    padding: 12px 24px;
+    background: #24292e;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-github:hover {
+    background: #2f363d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(36, 41, 46, 0.3);
+}
+
 .btn-logout {
     padding: 10px 20px;
     background: var(--bg);

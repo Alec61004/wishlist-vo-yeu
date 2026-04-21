@@ -5,31 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>💕 Wishlist của Thảo</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, collection, doc, setDoc, getDoc, updateDoc, deleteDoc, query, where, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAwK43XQv8Yc6Dh7yogwMlJEmAvYfpzpLI",
-            authDomain: "wishlist-thao.firebaseapp.com",
-            projectId: "wishlist-thao",
-            storageBucket: "wishlist-thao.firebasestorage.app",
-            messagingSenderId: "355598647381",
-            appId: "1:355598647381:web:f2a88da7a0fe56679714dc"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        window.firebaseApp = app;
-        window.firebaseAuth = auth;
-        window.firebaseDb = db;
-        window.firebaseAuthMethods = { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged };
-        window.firestoreMethods = { collection, doc, setDoc, getDoc, updateDoc, deleteDoc, query, where, getDocs, onSnapshot };
-    </script>
 </head>
 <body>
     <!-- Login Screen -->
@@ -137,6 +112,13 @@
         <!-- Random Section (for everyone) -->
         <div class="random-section">
             <button id="randomBtn" class="btn-random">🎲 Random Gift - Chọn ngẫu nhiên!</button>
+        </div>
+
+        <!-- GitHub Edit Button (only for owner) -->
+        <div class="github-section owner-only">
+            <a href="https://github.com/Alec61004/wishlist-vo-yeu/edit/main/wishlist.json" target="_blank" class="btn-github">
+                📝 Mở GitHub để sửa wishlist
+            </a>
         </div>
 
         <!-- Wishlist (only for owner) -->

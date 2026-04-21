@@ -1,10 +1,12 @@
-// Wishlist App
+// Wishlist App with GitHub JSON
 class WishlistApp {
     constructor() {
-        this.items = this.loadItems();
+        this.items = [];
         this.currentFilter = 'all';
         this.currentRandomItem = null;
         this.currentUser = null;
+        this.githubUrl = 'https://raw.githubusercontent.com/Alec61004/wishlist-vo-yeu/main/wishlist.json';
+        this.githubEditUrl = 'https://github.com/Alec61004/wishlist-vo-yeu/edit/main/wishlist.json';
 
         // Tài khoản mặc định của bạn
         this.defaultGuestAccount = {
@@ -102,7 +104,7 @@ class WishlistApp {
             this.currentUser = JSON.parse(savedUser);
             this.showMainApp();
             this.applyRolePermissions();
-            this.render();
+            this.loadWishlist();
         } else {
             this.showLoginScreen();
         }
@@ -146,7 +148,7 @@ class WishlistApp {
         localStorage.setItem('wishlist_current_user', JSON.stringify(this.currentUser));
         this.showMainApp();
         this.applyRolePermissions();
-        this.render();
+        this.loadWishlist();
         this.showNotification(`Xin chào, ${this.currentUser.displayName}! 💖`);
 
         usernameInput.value = '';
@@ -257,7 +259,32 @@ class WishlistApp {
         return this.currentUser && this.currentUser.role === 'owner';
     }
 
-    // ===== WISHLIST =====
+    // ===== WISHLIST (GITHUB JSON) =====
+    async loadWishlist() {
+        try {
+            // Thử load từ GitHub
+            const response = await fetch(this.githubUrl);
+            if (response.ok) {
+                const data = await response.json();
+                this.items = data.items || [];
+                this.render();
+                return;
+            }
+        } catch (error) {
+            console.error('Error loading from GitHub:', error);
+        }
+
+        // Fallback: load từ localStorage
+        const saved = localStorage.getItem('wishlist_items');
+        if (saved) {
+            this.items = JSON.parse(saved);
+            this.render();
+        } else {
+            this.items = [];
+            this.render();
+        }
+    }
+
     addItem() {
         if (!this.isOwner()) {
             alert('Bạn không có quyền thêm món mới.');
@@ -274,8 +301,8 @@ class WishlistApp {
             return;
         }
 
-        const item = {
-            id: Date.now(),
+        const newItem = {
+            id: Date.now().toString(),
             name,
             type,
             link,
@@ -284,7 +311,7 @@ class WishlistApp {
             createdAt: new Date().toISOString()
         };
 
-        this.items.unshift(item);
+        this.items.unshift(newItem);
         this.saveItems();
         this.render();
 
@@ -298,12 +325,14 @@ class WishlistApp {
             return;
         }
 
-        if (confirm('Bạn có chắc muốn xóa món này không?')) {
-            this.items = this.items.filter(item => item.id !== id);
-            this.saveItems();
-            this.render();
-            this.showNotification('Đã xóa! 🗑️');
+        if (!confirm('Bạn có chắc muốn xóa món này không?')) {
+            return;
         }
+
+        this.items = this.items.filter(item => item.id !== id);
+        this.saveItems();
+        this.render();
+        this.showNotification('Đã xóa! 🗑️');
     }
 
     toggleComplete(id) {
@@ -376,10 +405,10 @@ class WishlistApp {
                 ${linkHtml}
                 ${noteHtml}
                 <div class="item-actions">
-                    <button class="btn-action btn-complete" onclick="app.toggleComplete(${item.id})">
+                    <button class="btn-action btn-complete" onclick="app.toggleComplete('${item.id}')">
                         ${item.completed ? '↩️ Bỏ đánh dấu' : '✅ Đã hoàn thành'}
                     </button>
-                    <button class="btn-action btn-delete" onclick="app.deleteItem(${item.id})">
+                    <button class="btn-action btn-delete" onclick="app.deleteItem('${item.id}')">
                         🗑️ Xóa
                     </button>
                 </div>
@@ -492,11 +521,6 @@ class WishlistApp {
 
     saveItems() {
         localStorage.setItem('wishlist_items', JSON.stringify(this.items));
-    }
-
-    loadItems() {
-        const saved = localStorage.getItem('wishlist_items');
-        return saved ? JSON.parse(saved) : [];
     }
 
     initTheme() {
