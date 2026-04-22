@@ -1,12 +1,16 @@
-// Wishlist App with GitHub JSON
+// Wishlist App with Supabase
 class WishlistApp {
     constructor() {
         this.items = [];
         this.currentFilter = 'all';
         this.currentRandomItem = null;
         this.currentUser = null;
-        this.githubUrl = 'https://raw.githubusercontent.com/Alec61004/wishlist-vo-yeu/main/wishlist.json';
-        this.githubEditUrl = 'https://github.com/Alec61004/wishlist-vo-yeu/edit/main/wishlist.json';
+        this.unsubscribeChannel = null;
+
+        // Supabase config
+        this.supabaseUrl = 'https://gssoefbsebholdgwtrhg.supabase.co';
+        this.supabaseKey = 'sb_publishable_5NufQ0jVdrfmkJOs4w_fGg_i-oXvZE-';
+        this.supabase = window.supabase.createClient(this.supabaseUrl, this.supabaseKey);
 
         // Tài khoản mặc định của bạn
         this.defaultGuestAccount = {
@@ -98,13 +102,15 @@ class WishlistApp {
     }
 
     // ===== AUTH / USER =====
-    initAuth() {
+    async initAuth() {
+        // Kiểm tra session local
         const savedUser = localStorage.getItem('wishlist_current_user');
         if (savedUser) {
             this.currentUser = JSON.parse(savedUser);
             this.showMainApp();
             this.applyRolePermissions();
-            this.loadWishlist();
+            await this.loadWishlist();
+            this.setupRealtimeSync();
         } else {
             this.showLoginScreen();
         }
@@ -119,7 +125,7 @@ class WishlistApp {
         localStorage.setItem('wishlist_users', JSON.stringify(users));
     }
 
-    login() {
+    async login() {
         const usernameInput = document.getElementById('loginUsername');
         const passwordInput = document.getElementById('loginPassword');
         const username = usernameInput.value.trim();
@@ -131,7 +137,7 @@ class WishlistApp {
             this.currentUser.role = 'guest';
             this.currentUser.displayName = 'Người tặng quà';
         } else {
-            // Kiểm tra tài khoản đã đăng ký
+            // Kiểm tra tài khoản đã đăng ký (local)
             const users = this.getUsers();
             const user = users.find(u => u.username === username && u.password === password);
 
@@ -148,7 +154,8 @@ class WishlistApp {
         localStorage.setItem('wishlist_current_user', JSON.stringify(this.currentUser));
         this.showMainApp();
         this.applyRolePermissions();
-        this.loadWishlist();
+        await this.loadWishlist();
+        this.setupRealtimeSync();
         this.showNotification(`Xin chào, ${this.currentUser.displayName}! 💖`);
 
         usernameInput.value = '';
@@ -216,6 +223,12 @@ class WishlistApp {
         this.currentUser = null;
         this.closeRandomModal();
         this.showLoginScreen();
+
+        // Cleanup realtime subscription
+        if (this.unsubscribeChannel) {
+            this.supabase.removeChannel(this.unsubscribeChannel);
+            this.unsubscribeChannel = null;
+        }
     }
 
     showLoginScreen() {
@@ -259,33 +272,88 @@ class WishlistApp {
         return this.currentUser && this.currentUser.role === 'owner';
     }
 
-    // ===== WISHLIST (GITHUB JSON) =====
+    // ===== WISHLIST (SUPABASE) =====
     async loadWishlist() {
         try {
-            // Thử load từ GitHub
-            const response = await fetch(this.githubUrl);
-            if (response.ok) {
-                const data = await response.json();
-                this.items = data.items || [];
-                this.render();
-                return;
-            }
-        } catch (error) {
-            console.error('Error loading from GitHub:', error);
-        }
+            const { data, error } = await this.supabase
+                .from('wishlists')
+                .select('items')
+                .eq('id', 1)
+                .single();
 
-        // Fallback: load từ localStorage
-        const saved = localStorage.getItem('wishlist_items');
-        if (saved) {
-            this.items = JSON.parse(saved);
+            if (error) {
+                // Nếu chưa có row, tạo mới
+                if (error.code === 'PGRST116') {
+                    await this.createInitialWishlist();
+                    this.items = [];
+                } else {
+                    throw error;
+                }
+            } else {
+                this.items = data.items || [];
+            }
+
             this.render();
-        } else {
-            this.items = [];
+        } catch (error) {
+            console.error('Error loading wishlist:', error);
+            // fallback localStorage
+            const saved = localStorage.getItem('wishlist_items');
+            this.items = saved ? JSON.parse(saved) : [];
             this.render();
+            this.showNotification('Đang dùng dữ liệu local (chưa kết nối cloud)');
         }
     }
 
-    addItem() {
+    async createInitialWishlist() {
+        const { error } = await this.supabase
+            .from('wishlists')
+            .insert({ id: 1, items: [] });
+
+        if (error) {
+            console.error('Error creating initial wishlist:', error);
+        }
+    }
+
+    setupRealtimeSync() {
+        // Cleanup old channel
+        if (this.unsubscribeChannel) {
+            this.supabase.removeChannel(this.unsubscribeChannel);
+        }
+
+        this.unsubscribeChannel = this.supabase
+            .channel('wishlist_changes')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'wishlists',
+                    filter: 'id=eq.1'
+                },
+                (payload) => {
+                    this.items = payload.new.items || [];
+                    this.render();
+                    this.showNotification('Dữ liệu đã sync! 🔄');
+                }
+            )
+            .subscribe();
+    }
+
+    async saveWishlistToCloud() {
+        try {
+            const { error } = await this.supabase
+                .from('wishlists')
+                .upsert({ id: 1, items: this.items }, { onConflict: 'id' });
+
+            if (error) throw error;
+        } catch (error) {
+            console.error('Error saving to cloud:', error);
+            // fallback localStorage
+            localStorage.setItem('wishlist_items', JSON.stringify(this.items));
+        }
+    }
+
+    async addItem() {
         if (!this.isOwner()) {
             alert('Bạn không có quyền thêm món mới.');
             return;
@@ -312,14 +380,14 @@ class WishlistApp {
         };
 
         this.items.unshift(newItem);
-        this.saveItems();
+        await this.saveWishlistToCloud();
         this.render();
 
         document.getElementById('wishlistForm').reset();
         this.showNotification('Đã thêm vào wishlist! 💖');
     }
 
-    deleteItem(id) {
+    async deleteItem(id) {
         if (!this.isOwner()) {
             alert('Bạn không có quyền xóa món.');
             return;
@@ -330,12 +398,12 @@ class WishlistApp {
         }
 
         this.items = this.items.filter(item => item.id !== id);
-        this.saveItems();
+        await this.saveWishlistToCloud();
         this.render();
         this.showNotification('Đã xóa! 🗑️');
     }
 
-    toggleComplete(id) {
+    async toggleComplete(id) {
         if (!this.isOwner()) {
             alert('Bạn không có quyền đánh dấu hoàn thành.');
             return;
@@ -344,7 +412,7 @@ class WishlistApp {
         const item = this.items.find(item => item.id === id);
         if (item) {
             item.completed = !item.completed;
-            this.saveItems();
+            await this.saveWishlistToCloud();
             this.render();
             this.showNotification(item.completed ? 'Đã hoàn thành! 🎉' : 'Đã bỏ đánh dấu');
         }
@@ -517,10 +585,6 @@ class WishlistApp {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
-    }
-
-    saveItems() {
-        localStorage.setItem('wishlist_items', JSON.stringify(this.items));
     }
 
     initTheme() {
