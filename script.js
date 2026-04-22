@@ -9,7 +9,7 @@ class WishlistApp {
 
         // Supabase config
         this.supabaseUrl = 'https://gssoefbsebholdgwtrhg.supabase.co';
-        this.supabaseKey = 'sb_publishable_5NufQ0jVdrfmkJOs4w_fGg_i-oXvZE-';
+        this.supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdzc29lZmJzZWJob2xkZ3d0cmhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3Njg1NTUsImV4cCI6MjA5MjM0NDU1NX0.N0GtO2HbEB1iyOVZ5wbRLZaZPTdnLzTDL6L3Oawbuhc';
         this.supabase = window.supabase.createClient(this.supabaseUrl, this.supabaseKey);
 
         // Tài khoản mặc định của bạn
